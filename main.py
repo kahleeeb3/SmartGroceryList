@@ -1,7 +1,7 @@
 import tk_helper as tkh
-from PIL import Image, ImageGrab
-import torch
+from PIL import ImageGrab
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+
 
 processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten", use_fast=False)
 model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
@@ -16,11 +16,10 @@ def external_function():
     # img.save("test.png", "PNG")
 
     # convert to tensor and process
+    # Source: https://huggingface.co/microsoft/trocr-base-handwritten
     image = img.convert("RGB")
     pixel_values = processor(images=image, return_tensors="pt").pixel_values
-    with torch.no_grad():
-            generated_ids = model.generate(pixel_values)
-
+    generated_ids = model.generate(pixel_values)
     recognized_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     # print("Recognized Text:", recognized_text)
 
