@@ -53,12 +53,6 @@ class Widgets(Frames):
         self.list = tk.Listbox(self.left_frame, font=('Helvetica', 15))
         self.list.grid(row=0, column=0, sticky="nsew")
 
-        # add some random values for now
-        i = 0
-        while(i < 100):
-            self.list.insert(i, f'Temp {i}')
-            i += 1
-
     def create_canvas(self):
         self.canvas = tk.Canvas(self.right_frame, bg="white")
         self.canvas.grid(row=0, column=0, sticky="nsew")
