@@ -1,5 +1,4 @@
 import tkinter as tk
-from PIL import Image, ImageGrab
 
 class App:
     def __init__(self):
@@ -35,7 +34,7 @@ class Frames(App):
         self.right_frame = right_frame
 
 class Widgets(Frames):
-    def __init__(self):
+    def __init__(self, callback):
         # Initialize the parent class
         super().__init__()
 
@@ -48,6 +47,7 @@ class Widgets(Frames):
         #place widgets in the frames
         self.create_canvas()
         self.create_list()
+        self.callback = callback # external function
 
     def create_list(self):
         self.list = tk.Listbox(self.left_frame, font=('Helvetica', 15))
@@ -64,6 +64,10 @@ class Widgets(Frames):
         self.canvas.grid(row=0, column=0, sticky="nsew")
 
         def clear():
+
+            # save the image
+            self.canvas.update()
+            self.callback() # do something with data before clearing screen
             self.canvas.delete("all")
 
         def reset_timer():
@@ -76,6 +80,5 @@ class Widgets(Frames):
             x, y = event.x, event.y
             self.canvas.create_oval(x-2, y-2, x+2, y+2, fill="black", outline="black", tags='writing')
 
-
-        # blind clicking to drawing
-        self.canvas.bind("<B1-Motion>", draw)        
+        self.canvas.bind("<B1-Motion>", draw)
+             
