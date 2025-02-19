@@ -50,11 +50,17 @@ class Widgets(Frames):
         self.callback = callback # external function
 
     def create_list(self):
-        self.list = tk.Listbox(self.left_frame, font=('Helvetica', 15))
+        self.list = tk.Listbox(
+            self.left_frame,
+            bg='black',
+            fg='white',
+            selectbackground='gray',
+            font=('Helvetica', 15),
+        )
         self.list.grid(row=0, column=0, sticky="nsew")
 
     def create_canvas(self):
-        self.canvas = tk.Canvas(self.right_frame, bg="white")
+        self.canvas = tk.Canvas(self.right_frame, bg="black")
         self.canvas.grid(row=0, column=0, sticky="nsew")
 
         def clear():
@@ -72,7 +78,7 @@ class Widgets(Frames):
         def draw(event):
             reset_timer()
             x, y = event.x, event.y
-            self.canvas.create_oval(x-2, y-2, x+2, y+2, fill="black", outline="black", tags='writing')
+            self.canvas.create_oval(x-2, y-2, x+2, y+2, fill="white", outline="white", tags='writing')
 
         self.canvas.bind("<B1-Motion>", draw)
              
