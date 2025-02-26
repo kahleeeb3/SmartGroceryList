@@ -8,6 +8,11 @@
 python .\main.py localhost 8000
 ```
 
+```
+pip install 'transformers[torch]'
+pip install pillow
+```
+
 # Python Virtual Environment on Windows
 ```
 python -m venv env
