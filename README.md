@@ -19,3 +19,8 @@ python -m venv env
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 env\Scripts\activate.bat
 ```
+
+# To Do
+- Reset timer does not work as expected
+- canvas is causing scroll bars when it should not
+- crop the canvas before processing to improve accuracy
