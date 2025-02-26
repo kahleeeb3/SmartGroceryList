@@ -52,7 +52,14 @@ function enableDrawing(){
         // capture image data
         const imageData = canvas.toDataURL();
         
-        // DO SOMETHING WITH THE DATA HERE
+        // Send data back to the flask server
+        fetch('/save_canvas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageData })
+        }).then(response => response.text())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
 
         // clear canvas
         ctx.fillStyle = "white";
