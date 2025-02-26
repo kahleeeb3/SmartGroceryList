@@ -27,39 +27,40 @@ document.addEventListener("DOMContentLoaded", function() {
         canvas.height = canvasContainer.clientHeight;
     }
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas); // window resize
 
-    let drawing = false;
-    let timeout;
+    let drawTimer; // store draw timer
+    let drawTimerLimit = 3000; // 3 seconds
 
-    function resetTimer() {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-        }, 3000); // 3 seconds
-    }
-
-    canvas.addEventListener("mousedown", (event) => {
-        drawing = true;
+    function beginDraw(event){
         ctx.beginPath();
         ctx.moveTo(event.offsetX, event.offsetY);
-        resetTimer();
-    });
+        canvas.addEventListener("mousemove", draw);
+        drawTimerReset();
+    }
 
-    canvas.addEventListener("mousemove", (event) => {
-        if (!drawing) return;
+    function endDraw(){
+        canvas.removeEventListener("mousemove", draw);
+        drawTimerReset();
+    }
+
+    function draw(event){
         ctx.lineTo(event.offsetX, event.offsetY);
         ctx.stroke();
-        resetTimer();
-    });
+    }
 
-    canvas.addEventListener("mouseup", () => {
-        drawing = false;
-        resetTimer();
-    });
+    function drawTimerReset() {
+        // clear existing timer
+        if (drawTimer) {
+            clearTimeout(drawTimer);
+        }
+        drawTimer = setTimeout(drawTimerEnd, drawTimerLimit);
+    }
 
-    canvas.addEventListener("mouseleave", () => {
-        drawing = false;
-        resetTimer();
-    });
+    function drawTimerEnd(){
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
+    }
+
+    canvas.addEventListener("mousedown", beginDraw);
+    canvas.addEventListener("mouseup", endDraw);
 });
