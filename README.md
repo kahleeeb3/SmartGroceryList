@@ -1,16 +1,22 @@
 # SmartGroceryList
-Idea: connect a pi zero w to a portable touch screen. Mount it to the wall. write grocery list items on the screen, converts handwriting to a text based list. Remove items from the list by scratching them out. Remove all items by drawing an X on the screen. 
-Bonus idea: have a discord bot manage the list that way you can see a copy of the list on your phone
+> Idea: Create a client web server that allows users to write grocery list items on the screen. Send image data to a python host server converts handwriting to a text based list. 
+> Bonus idea: have a discord bot manage the list that way you can see a copy of the list on your phone
 
-# Run Python Web Server
+# Run HTML Client Web Server
 ```
 python -m http.server
 ```
 
-# Python Virtual Environment
+# Python Host Web Server
+```
+pip install websockets
+pip install pillow
+pip install 'transformers[torch]'
+```
+
+# Python Virtual Environment on Windows
 ```
 python -m venv env
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 env\Scripts\activate.bat
-pip install websockets
 ```

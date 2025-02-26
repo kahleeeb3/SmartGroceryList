@@ -1,36 +1,30 @@
 import asyncio
 import websockets
-import base64
+from handwrittenOCR import convertToText
 
-async def save_image(websocket):
+async def receiveData(websocket):
     while True:
         try:
             # Receive Base64-encoded image data from client
             message = await websocket.recv()
-            print("Received image data")
 
             # Extract Base64 data (remove the "data:image/png;base64," prefix)
             if message.startswith("data:image/png;base64,"):
                 message = message.replace("data:image/png;base64,", "")
 
-            # Decode the Base64 string to bytes
-            image_data = base64.b64decode(message)
-
-            # Save the image
-            with open("received_image.png", "wb") as file:
-                file.write(image_data)
-
-            print("Image saved as received_image.png")
-
+            # saveImage(message) # if you want to save the image data
+            recognized_text = convertToText(message)
+            
             # Send confirmation back to client
-            await websocket.send("Image received and saved!")
+            await websocket.send(recognized_text)
 
         except websockets.exceptions.ConnectionClosed:
             print("Connection closed")
             break
 
 async def main():
-    async with websockets.serve(save_image, "localhost", 8765):
+    async with websockets.serve(receiveData, "localhost", 8765):
+        print("Server Running...")
         await asyncio.Future()  # Run the server forever
 
 asyncio.run(main())
