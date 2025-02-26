@@ -16,7 +16,7 @@ function addListItem(){
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+function enableDrawing(){
     const canvasContainer = document.querySelector(".canvas");
     const canvas = document.getElementById("drawingCanvas");
     const ctx = canvas.getContext("2d");
@@ -58,9 +58,18 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function drawTimerEnd(){
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
+        // capture image data
+        const imageData = canvas.toDataURL();
+        const img = document.createElement('img');
+        img.src = imageData;
+
+        // clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     canvas.addEventListener("mousedown", beginDraw);
     canvas.addEventListener("mouseup", endDraw);
-});
+}
+
+// Listen for all content to be loaded
+document.addEventListener("DOMContentLoaded", enableDrawing);
