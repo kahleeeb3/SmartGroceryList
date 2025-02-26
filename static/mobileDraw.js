@@ -20,11 +20,10 @@ function enableDrawing(){
     let drawTimerLimit = 3000; // 3 seconds
 
     function beginDraw(event){
-        event.preventDefault(); // prevent default touch behavior (scrolling, etc.)
         const touch = event.touches[0];
         ctx.beginPath();
         ctx.moveTo(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop);
-        canvas.addEventListener("touchmove", draw);
+        canvas.addEventListener("touchmove", draw, { passive: true }); // passive prevents scroll
         drawTimerReset();
     }
 
@@ -34,7 +33,6 @@ function enableDrawing(){
     }
 
     function draw(event){
-        event.preventDefault(); // prevent default touch behavior
         const touch = event.touches[0];
         ctx.lineTo(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop);
         ctx.stroke();
@@ -53,12 +51,13 @@ function enableDrawing(){
         const imageData = canvas.toDataURL();
         
         // Send data back to the flask server
-        fetch('/save_canvas', {
+        fetch('process_canvas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ image: imageData })
-        }).then(response => response.text())
-        .then(data => console.log(data))
+        })
+        .then(response => response.text())
+        // .then(data => console.log(data))
         .catch(error => console.error('Error:', error));
 
         // clear canvas
@@ -66,7 +65,7 @@ function enableDrawing(){
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    canvas.addEventListener("touchstart", beginDraw);
+    canvas.addEventListener("touchstart", beginDraw, { passive: true }); // passive prevents scroll
     canvas.addEventListener("touchend", endDraw);
 }
 
