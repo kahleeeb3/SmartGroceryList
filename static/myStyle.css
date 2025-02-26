@@ -5,19 +5,19 @@ html, body {
 }
 
 .background{
-    background-color:black;
+    background-color:grey;
     height: 100%;
     width:100%;
 }
 .sidebar{
-    background-color:green;
+    /* background-color:black; */
     height: 100vh;
     width:  30%;
 }
 .canvas {
     width: 70%;
     height: 100vh;
-    background-color: red;
+    /* background-color: red; */
 }
 
 canvas {

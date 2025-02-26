@@ -1,26 +1,3 @@
-function sendData(data){
-    // Create a WebSocket client connection to the Python server
-    const socket = new WebSocket('ws://localhost:8765');
-
-    // Event listener for when the WebSocket connection opens
-    socket.addEventListener('open', function (event) {
-        console.log('Client: Connected');
-        socket.send(data);
-        console.log(`Client: Data Sent`);
-    });
-
-    // Event listener for receiving messages from the server
-    socket.addEventListener('message', function (event) {
-        console.log(`Server: ${event.data}`);
-        socket.close(); // close the socket when you're done with it
-    });
-
-    // Close the socket when the message is sent
-    socket.addEventListener('close', function () {
-        console.log('Client: WebSocket Closed');
-    });
-}
-
 function enableDrawing(){
     const canvasContainer = document.querySelector(".canvas");
     const canvas = document.getElementById("drawingCanvas");
@@ -74,7 +51,8 @@ function enableDrawing(){
     function drawTimerEnd(){
         // capture image data
         const imageData = canvas.toDataURL();
-        sendData(imageData);
+        
+        // DO SOMETHING WITH THE DATA HERE
 
         // clear canvas
         ctx.fillStyle = "white";
