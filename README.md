@@ -9,6 +9,7 @@ python .\main.py localhost 8000
 ```
 
 ```
+pip install flask
 pip install 'transformers[torch]'
 pip install pillow
 ```
