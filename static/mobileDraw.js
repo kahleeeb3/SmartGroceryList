@@ -20,32 +20,34 @@ function enableDrawing(){
     let drawTimerLimit = 3000; // 3 seconds
 
     function beginDraw(event){
-        event.preventDefault(); // prevent scrolling
         const touch = event.touches[0];
+        event.preventDefault(); // prevent scrolling
         ctx.beginPath();
         ctx.moveTo(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop);
         canvas.addEventListener("touchmove", draw, { passive: false });
-        drawTimerReset();
-    }
-
-    function endDraw(){
-        canvas.removeEventListener("touchmove", draw);
-        drawTimerReset();
+        drawTimerReset(startNewTimer = false); // clear existing timer, don't start a new one
     }
 
     function draw(event){
-        event.preventDefault(); // prevent draw
         const touch = event.touches[0];
+        event.preventDefault(); // prevent scrolling
         ctx.lineTo(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop);
         ctx.stroke();
     }
 
-    function drawTimerReset() {
+    function endDraw(){
+        canvas.removeEventListener("touchmove", draw);
+        drawTimerReset(startNewTimer = true); // clear existing timer AND start a new one
+    }
+
+    function drawTimerReset(startNewTimer) {
         // clear existing timer
         if (drawTimer) {
             clearTimeout(drawTimer);
         }
-        drawTimer = setTimeout(drawTimerEnd, drawTimerLimit);
+        if (startNewTimer == true){
+            drawTimer = setTimeout(drawTimerEnd, drawTimerLimit);
+        }
     }
 
     function drawTimerEnd(){
