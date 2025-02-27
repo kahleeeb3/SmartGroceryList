@@ -1,115 +1,159 @@
-function enableDrawing(){
-    const canvasContainer = document.querySelector(".canvas");
-    const canvas = document.getElementById("drawingCanvas");
-    const ctx = canvas.getContext("2d");
-    ctx.lineWidth = 1; // lines should be 1 pixel
+class DrawingCanvas {
+    constructor(parentDivClass, canvasColor, strokeStyle) {
+        
+        this.canvasContainer = document.querySelector(parentDivClass);
+        this.canvasColor = canvasColor;
+        this.strokeStyle = strokeStyle;
+        this.userIsDrawing = false;
 
-    function clear_canvas(){
-        ctx.fillStyle = "white"; // set white background
-        ctx.fillRect(0, 0, canvas.width, canvas.height); // clear the screen
+        this.#adjustContainer();
+        this.#createCanvas();
+        this.#resizeCanvas();
+
+        // Bound methods to keep the correct `this`
+        this._resizeCanvas = this.#resizeCanvas.bind(this);
+        this._beginDraw = this.#beginDraw.bind(this);
+        this._draw = this.#draw.bind(this);
+        this._endDraw = this.#endDraw.bind(this);
+
+        // Event listeners
+        window.addEventListener("resize", this._resizeCanvas);
+        this.canvas.addEventListener("touchstart", this._beginDraw, { passive: false });
+        this.canvas.addEventListener("touchmove", this._draw, { passive: false });
+        this.canvas.addEventListener("touchend", this._endDraw);
     }
     
-    function resizeCanvas() {
-        canvas.width = canvasContainer.clientWidth;
-        canvas.height = canvasContainer.clientHeight;
-        clear_canvas();
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas); // window resize
-
-    let drawTimer; // store draw timer
-    let drawTimerLimit = 3000; // 3 seconds
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity; // bounding box
-    const pad = 10; // padding around bounding box
-
-    function beginDraw(event){
-        const touch = event.touches[0];
-        event.preventDefault(); // prevent scrolling
-        ctx.beginPath();
-        ctx.moveTo(touch.clientX - canvas.offsetLeft, touch.clientY - canvas.offsetTop);
-        canvas.addEventListener("touchmove", draw, { passive: false });
-        drawTimerReset(startNewTimer = false); // clear existing timer, don't start a new one
+    #adjustContainer(){
+        this.canvasContainer.style.position = 'relative';
+        this.canvasContainer.style.overflow = 'hidden';
     }
 
-    function draw(event){
+    #createCanvas(){
+        this.canvas = document.createElement('canvas');
+        this.canvasContainer.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext('2d');
+    }
+
+    #resizeCanvas(){
+        this.canvas.width = this.canvasContainer.clientWidth;
+        this.canvas.height = this.canvasContainer.clientHeight;
+        this.clearCanvas();
+    }
+
+    clearCanvas(){
+        this.ctx.fillStyle = this.canvasColor; // set white background
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    #beginDraw(event){
         const touch = event.touches[0];
         event.preventDefault(); // prevent scrolling
+
+        // Get the position of the canvas relative to the viewport
+        const rect = this.canvas.getBoundingClientRect();
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        this.userIsDrawing = true;
+    }
+
+    #draw(event){
+        if (!this.userIsDrawing) return;
+
+        event.preventDefault(); // prevent scrolling
+        const touch = event.touches[0];
+
+        // Get the position of the canvas relative to the viewport
+        const rect = this.canvas.getBoundingClientRect();
 
         // where the line is going to
-        let x = touch.clientX - canvas.offsetLeft;
-        let y = touch.clientY - canvas.offsetTop;
-
-        // Update bounding box
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
+        let x = touch.clientX - rect.left;
+        let y = touch.clientY - rect.top;
 
         // draw the line between point
-        ctx.strokeStyle = "black";
-        ctx.lineTo(x, y);
-        ctx.stroke();
+        this.ctx.strokeStyle = this.strokeStyle;
+        this.ctx.lineTo(x, y);
+        this.ctx.stroke();
     }
-
-    function endDraw(){
-        canvas.removeEventListener("touchmove", draw);
-        drawTimerReset(startNewTimer = true); // clear existing timer AND start a new one
+    
+    #endDraw(){
+        this.userIsDrawing = false;
     }
+}
 
-    function drawTimerReset(startNewTimer) {
-        // clear existing timer
-        if (drawTimer) {
-            clearTimeout(drawTimer);
-        }
-        if (startNewTimer == true){
-            drawTimer = setTimeout(drawTimerEnd, drawTimerLimit);
-        }
-    }
 
-    function drawTimerEnd(){
+document.addEventListener("DOMContentLoaded", function () {
+    // const drawing = new DrawingCanvas(".drawingCanvas", "white", "black");
+});
 
-        // define bounding box param
-        let boundX = minX-pad;
-        let boundY = minY-pad;
-        let boundWidth = maxX-minX+2*pad;
-        let boundHeight = maxY-minY+2*pad;
 
-        // draw box slight outside the bounding area
-        ctx.strokeStyle = "red";
-        ctx.strokeRect(boundX-1, boundY-1, boundWidth+2, boundHeight+2);
-        
-        // Copy section of original canvas to a new canvas and extract data
-        const croppedCanvas = document.createElement('canvas');
-        const croppedCtx = croppedCanvas.getContext('2d');
-        croppedCanvas.width = boundWidth;
-        croppedCanvas.height = boundHeight;
-        croppedCtx.drawImage(
-            canvas, // source canvas
-            boundX, boundY, boundWidth, boundHeight, // source area
-            0, 0, boundWidth, boundHeight // where to draw on cropped canvas
-        );
-        
-        // Send data back to the flask server
-        fetch('process_canvas', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            // body: JSON.stringify({ image: canvas.toDataURL() }) // send whole canvas
-            body: JSON.stringify({ image: croppedCanvas.toDataURL() }) // send cropped canvas
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-            clear_canvas();
-        })
-        .catch(error => console.error('Error:', error));
 
-        // reset bounding box
-        minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    }
+/*
+function endDraw(){
+    canvas.removeEventListener("touchmove", draw);
+}
 
+function draw(event){
+    const touch = event.touches[0];
+    event.preventDefault(); // prevent scrolling
+
+    // Get the position of the canvas relative to the viewport
+    const rect = canvas.getBoundingClientRect();
+    
+    // where the line is going to
+    let x = touch.clientX - rect.left;
+    let y = touch.clientY - rect.top;
+
+    // draw the line between point
+    ctx.strokeStyle = "black";
+    ctx.lineTo(x, y);
+    ctx.stroke();
+}
+
+function beginDraw(event){
+    const touch = event.touches[0];
+    event.preventDefault(); // prevent scrolling
+
+    // Get the position of the canvas relative to the viewport
+    const rect = canvas.getBoundingClientRect();
+
+    ctx.beginPath();
+    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    canvas.addEventListener("touchmove", draw, { passive: false });
+}
+
+function clearCanvas(){
+    ctx.fillStyle = "white"; // set white background
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // clear the screen
+}
+
+function resizeCanvas(){
+    canvas.width = canvasContainer.clientWidth;
+    canvas.height = canvasContainer.clientHeight;
+    clearCanvas();
+}
+
+function enableDrawing(){
+    // Get the parent div provided
+    canvasContainer = document.querySelector(".drawingCanvas");
+    
+    // adjust the parent to prevent overflow
+    canvasContainer.style.position = 'relative';
+    canvasContainer.style.overflow = 'hidden';
+
+    // create canvas element
+    canvas = document.createElement('canvas');
+    canvasContainer.appendChild(canvas);
+    ctx = canvas.getContext('2d');
+    resizeCanvas();
+
+    // enable interaction with the canvas
+    window.addEventListener("resize", resizeCanvas);
     canvas.addEventListener("touchstart", beginDraw, { passive: false });
     canvas.addEventListener("touchend", endDraw);
 }
 
+
 // Listen for all content to be loaded
 document.addEventListener("DOMContentLoaded", enableDrawing);
+*/
