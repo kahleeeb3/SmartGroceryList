@@ -16,11 +16,17 @@ class DrawingCanvas {
         this._draw = this.#draw.bind(this);
         this._endDraw = this.#endDraw.bind(this);
 
-        // Event listeners
+        // Event listeners for touchscreen
         window.addEventListener("resize", this._resizeCanvas);
         this.canvas.addEventListener("touchstart", this._beginDraw, { passive: false });
         this.canvas.addEventListener("touchmove", this._draw, { passive: false });
         this.canvas.addEventListener("touchend", this._endDraw);
+
+        // Event listeners for mouse
+        this.canvas.addEventListener("mousedown", this._beginDraw, { passive: false });
+        this.canvas.addEventListener("mousemove", this._draw, { passive: false });
+        this.canvas.addEventListener("mouseup", this._endDraw);
+
     }
     
     #adjustContainer(){
@@ -46,33 +52,46 @@ class DrawingCanvas {
     }
 
     #beginDraw(event){
-        const touch = event.touches[0];
         event.preventDefault(); // prevent scrolling
 
-        // Get the position of the canvas relative to the viewport
-        const rect = this.canvas.getBoundingClientRect();
+        let x, y;
+        if (event.touches) {
+            // Handle touch event
+            const touch = event.touches[0];
+            x = touch.clientX;
+            y = touch.clientY;
+        } else {
+            // Handle mouse event
+            x = event.clientX;
+            y = event.clientY;
+        }
 
+        const rect = this.canvas.getBoundingClientRect();
         this.ctx.beginPath();
-        this.ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        this.ctx.moveTo(x - rect.left, y - rect.top);
         this.userIsDrawing = true;
     }
 
     #draw(event){
         if (!this.userIsDrawing) return;
 
-        event.preventDefault(); // prevent scrolling
-        const touch = event.touches[0];
+        event.preventDefault(); // prevent default action (like scrolling)
 
-        // Get the position of the canvas relative to the viewport
+        let x, y;
+        if (event.touches) {
+            // Handle touch event
+            const touch = event.touches[0];
+            x = touch.clientX;
+            y = touch.clientY;
+        } else {
+            // Handle mouse event
+            x = event.clientX;
+            y = event.clientY;
+        }
+
         const rect = this.canvas.getBoundingClientRect();
-
-        // where the line is going to
-        let x = touch.clientX - rect.left;
-        let y = touch.clientY - rect.top;
-
-        // draw the line between point
         this.ctx.strokeStyle = this.strokeStyle;
-        this.ctx.lineTo(x, y);
+        this.ctx.lineTo(x - rect.left, y - rect.top);
         this.ctx.stroke();
     }
     
@@ -83,7 +102,7 @@ class DrawingCanvas {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    // const drawing = new DrawingCanvas(".drawingCanvas", "white", "black");
+    const drawing = new DrawingCanvas(".drawingCanvas", "white", "black");
 });
 
 

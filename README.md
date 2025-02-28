@@ -5,7 +5,7 @@
 
 # Run Flask Web Server
 ```
-python .\main.py localhost 8000
+python main.py localhost 8000
 ```
 
 ```
