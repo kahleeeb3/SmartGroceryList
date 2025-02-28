@@ -20,6 +20,7 @@ class DrawingCanvas {
         this.#createCanvas();
         this.#resizeCanvas();
         this.#createEventListeners();
+        this.resetBoundingBox();
 
     }
     
@@ -70,6 +71,28 @@ class DrawingCanvas {
     }
 
     /**
+     * Sets the values for the drawing bounding box to infinity
+     */
+    resetBoundingBox(){
+        // track the boundary of the users writing
+        this.minX = Infinity;
+        this.minY = Infinity;
+        this.maxX = -Infinity;
+        this.maxY = -Infinity;
+    }
+
+    /**
+     * Keeps track on the min & max x,y coordinates of the users writing. Useful for cropping the canvas.
+     * @private
+     */
+    #updateBoundingBox(x, y){
+        this.minX = Math.min(this.minX, x);
+        this.minY = Math.min(this.minY, y);
+        this.maxX = Math.max(this.maxX, x);
+        this.maxY = Math.max(this.maxY, y);
+    }
+
+    /**
      * Clears the canvas with the specified background color.
      */
     clearCanvas(){
@@ -97,9 +120,13 @@ class DrawingCanvas {
             y = event.clientY;
         }
 
+        // adjust for position relative to the canvas
         const rect = this.canvas.getBoundingClientRect();
+        x = x - rect.left;
+        y = y - rect.top;
+
         this.ctx.beginPath();
-        this.ctx.moveTo(x - rect.left, y - rect.top);
+        this.ctx.moveTo(x, y);
         this.userIsDrawing = true;
         this.onDrawBegin();
     }
@@ -126,9 +153,15 @@ class DrawingCanvas {
             y = event.clientY;
         }
 
+        // adjust for position relative to the canvas
         const rect = this.canvas.getBoundingClientRect();
+        x = x - rect.left;
+        y = y - rect.top;
+
+        this.#updateBoundingBox(x, y); // update bounding box
+
         this.ctx.strokeStyle = this.strokeStyle;
-        this.ctx.lineTo(x - rect.left, y - rect.top);
+        this.ctx.lineTo(x, y);
         this.ctx.stroke();
     }
     
