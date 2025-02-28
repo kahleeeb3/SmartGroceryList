@@ -77,3 +77,17 @@ class MyClass{
 new MyClass();
 ```
 This is stupid because you're assigning the bind to a public variable so the user will still see `myClassInstance._somethingPrivate()` as a public method...
+
+# Private Data Within a Class
+```js
+class MyClass{
+    #internalData;
+    constructor(){
+        this.externalData = 26;
+        this.#internalData = 5;
+    }
+}
+test = new MyClass();
+console.log(test.externalData);
+console.log(test.#internalData); // SyntaxError during parsing, not a runtime error
+```
