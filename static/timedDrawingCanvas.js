@@ -68,12 +68,20 @@ class TimedDrawingCanvas extends DrawingCanvas {
             // body: JSON.stringify({ image: canvas.toDataURL() }) // send whole canvas
             body: JSON.stringify({ image: this.canvasData }) // send cropped canvas
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
             console.log(data);
+            this.#addToList(data.recognized_text);
             this.clearCanvas();
         })
         .catch(error => console.error('Error:', error));
+    }
+
+    #addToList(itemText){
+        const myList = document.querySelector('.groceryList'); //select the list
+        const newListItem = document.createElement('li');
+        newListItem.textContent = itemText;
+        myList.appendChild(newListItem);
     }
 
 }

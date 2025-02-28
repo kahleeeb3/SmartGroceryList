@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import base64
 import sys # for arguments
-# from handwrittenOCR import save_image, convert_image_to_text
+# from handwrittenOCR import convert_image_to_text
 
 app = Flask(__name__)
 
@@ -18,7 +18,7 @@ def process_canvas():
     # Save the Image
     with open("drawing.png", "wb") as f:
         f.write(img_bytes)
-    return jsonify({"message": "Image Saved"})
+    return jsonify({"message": "Image Saved", "recognized_text": "temp"})
     
     # convert to text
     # recognized_text = convert_image_to_text(img_bytes) # detect whats written in the image

@@ -12,8 +12,29 @@ body{
     grid-template-columns: 30% 70%; /* two columns */
 }
 body > div {
-    background-color: black;
+    /* background-color: white; */
     /* padding: 10px; */
     /* border: 2px solid black; */
     margin: 5px;
+}
+
+.sidebar {
+    background-color: black; /* Sidebar is black */
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Arrange items vertically */
+    align-items: center; /* Center horizontally */
+    color: white; /* Text is white */
+}
+
+.sidebar ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0;
+    text-align: center; /* Center text within list items */
+}
+
+.sidebar li {
+    padding: 10px; /* Add some padding to list items */
+    font-size: 1.2em; /* Increase font size for readability */
+    word-wrap: break-word; /* Allows long words to break onto new lines */
 }
