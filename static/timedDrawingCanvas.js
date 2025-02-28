@@ -7,32 +7,32 @@ class TimedDrawingCanvas extends DrawingCanvas {
 
         this.timer; // stores the timer value
         this.timeLimit = timeLimit;
-        this.timerEnd = this.timerEnd.bind(this); // Bind the timerEnd method to this instance
     }
 
     onDrawBegin(){
-        this.timerReset(false);
+        this.#timerReset(false);
     }
     onDrawEnd(){
-        this.timerReset(true);
+        this.#timerReset(true);
     }
 
-    timerReset(startNewTimer) {
+    #timerReset(startNewTimer) {
         if (this.timer) {
             clearTimeout(this.timer); // clear existing timer
         }
         if (startNewTimer == true){
-            this.timer = setTimeout(this.timerEnd, this.timeLimit); // start new timer
+            this.timer = setTimeout(this.#timerEnd.bind(this), this.timeLimit); // start new timer
         }
     }
 
-    timerEnd(){
-        console.log("Timer Ended");
+    #timerEnd(){
+        this.clearCanvas();
     }
 
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    // const canvasInstance = new TimedDrawingCanvas(".drawingCanvas", "white", "black");
-    window.TimedDrawingCanvas = TimedDrawingCanvas; // Expose the class globally
+    const canvasInstance = new TimedDrawingCanvas(".drawingCanvas", "white", "black");
+    // window.DrawingCanvas = DrawingCanvas; // Expose the class globally
+    // window.TimedDrawingCanvas = TimedDrawingCanvas; // Expose the class globally
 });
