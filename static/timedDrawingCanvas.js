@@ -26,13 +26,60 @@ class TimedDrawingCanvas extends DrawingCanvas {
     }
 
     #timerEnd(){
-        this.clearCanvas();
+        this.#drawBoundingBox();
+        this.#extractCanvasData();
+        this.#sendData();
+        this.resetBoundingBox();
+    }
+
+    #drawBoundingBox(){
+        // define bounding box params
+        const pad = 10; // padding around bounding box
+        this.boundX = this.minX - pad;
+        this.boundY = this.minY - pad;
+        this.boundWidth = this.maxX - this.minX + 2 * pad;
+        this.boundHeight = this.maxY - this.minY + 2 * pad;
+
+        // draw box
+        this.ctx.strokeStyle = "red";
+        this.ctx.strokeRect(this.boundX - 1, this.boundY - 1, this.boundWidth + 2, this.boundHeight + 2); // add slightly more padding
+    }
+
+    #extractCanvasData(){
+        // Copy section of original canvas to a new canvas and extract data
+        const croppedCanvas = document.createElement('canvas');
+        const croppedCtx = croppedCanvas.getContext('2d');
+        croppedCanvas.width = this.boundWidth;
+        croppedCanvas.height = this.boundHeight;
+        croppedCtx.drawImage(
+            this.canvas, // source canvas
+            this.boundX, this.boundY, this.boundWidth, this.boundHeight, // source area
+            0, 0, this.boundWidth, this.boundHeight // where to draw on cropped canvas
+        );
+
+        this.canvasData = croppedCanvas.toDataURL();
+    }
+
+    #sendData(){
+        // Send data back to the flask server
+        fetch('process_canvas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // body: JSON.stringify({ image: canvas.toDataURL() }) // send whole canvas
+            body: JSON.stringify({ image: this.canvasData }) // send cropped canvas
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            this.clearCanvas();
+        })
+        .catch(error => console.error('Error:', error));
     }
 
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    const canvasInstance = new TimedDrawingCanvas(".drawingCanvas", "white", "black");
+    const canvasInstance = new TimedDrawingCanvas(".drawingCanvas", "black", "white");
     // window.DrawingCanvas = DrawingCanvas; // Expose the class globally
     // window.TimedDrawingCanvas = TimedDrawingCanvas; // Expose the class globally
 });
