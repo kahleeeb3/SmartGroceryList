@@ -31,22 +31,16 @@ class DrawingCanvas {
     }
 
     #createEventListeners(){
-        // Bound methods to keep the correct `this`
-        this._resizeCanvas = this.#resizeCanvas.bind(this);
-        this._beginDraw = this.#beginDraw.bind(this);
-        this._draw = this.#draw.bind(this);
-        this._endDraw = this.#endDraw.bind(this);
-
         // Event listeners for touchscreen
-        window.addEventListener("resize", this._resizeCanvas);
-        this.canvas.addEventListener("touchstart", this._beginDraw, { passive: false });
-        this.canvas.addEventListener("touchmove", this._draw, { passive: false });
-        this.canvas.addEventListener("touchend", this._endDraw);
+        window.addEventListener("resize", this.#resizeCanvas.bind(this));
+        this.canvas.addEventListener("touchstart", this.#beginDraw.bind(this), { passive: false });
+        this.canvas.addEventListener("touchmove", this.#draw.bind(this), { passive: false });
+        this.canvas.addEventListener("touchend", this.#endDraw.bind(this));
 
         // Event listeners for mouse
-        this.canvas.addEventListener("mousedown", this._beginDraw, { passive: false });
-        this.canvas.addEventListener("mousemove", this._draw, { passive: false });
-        this.canvas.addEventListener("mouseup", this._endDraw);
+        this.canvas.addEventListener("mousedown", this.#beginDraw.bind(this), { passive: false });
+        this.canvas.addEventListener("mousemove", this.#draw.bind(this), { passive: false });
+        this.canvas.addEventListener("mouseup", this.#endDraw.bind(this));
     }
 
     clearCanvas(){

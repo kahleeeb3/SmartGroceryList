@@ -34,3 +34,46 @@ body > div {
     margin: 5px;
 }
 ```
+## How can I make an event listeners call a private method in a javascript class?
+```js
+class MyClass{
+    constructor(){
+        window.addEventListener("mousedown", this.#somethingPrivate);
+        this.someValue = "myValue"
+    }
+    #somethingPrivate(){
+        console.log(this.someValue);
+    }
+}
+new MyClass();
+```
+So I want to create a class that listens for when the user clicks their mouse and then executes a private function in the class that will print some value. However, event listeners, by default, call their handlers with `this` set to the element that triggered the event. So in `console.log(this.someValue);` the `this` is going to refer to the `window` and not the instance of `MyClass`.
+
+The most straightforward way to fix this is to use the `bind` method to explicitly set the `this` context of `#somethingPrivate` to the `MyClass` instance.
+```js
+class MyClass{
+    constructor(){
+        window.addEventListener("mousedown", this.#somethingPrivate.bind(this));
+        this.someValue = "myValue"
+    }
+    #somethingPrivate(){
+        console.log(this.someValue);
+    }
+}
+new MyClass();
+```
+Chat GPT suggested that I do this:
+```js
+class MyClass{
+    constructor(){
+        this._somethingPrivate = this.#somethingPrivate.bind(this);
+        window.addEventListener("mousedown", this._somethingPrivate);
+        this.someValue = "myValue"
+    }
+    #somethingPrivate(){
+        console.log(this.someValue);
+    }
+}
+new MyClass();
+```
+This is stupid because you're assigning the bind to a public variable so the user will still see `myClassInstance._somethingPrivate()` as a public method...
