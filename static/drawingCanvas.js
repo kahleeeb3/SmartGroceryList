@@ -9,23 +9,7 @@ class DrawingCanvas {
         this.#adjustContainer();
         this.#createCanvas();
         this.#resizeCanvas();
-
-        // Bound methods to keep the correct `this`
-        this._resizeCanvas = this.#resizeCanvas.bind(this);
-        this._beginDraw = this.#beginDraw.bind(this);
-        this._draw = this.#draw.bind(this);
-        this._endDraw = this.#endDraw.bind(this);
-
-        // Event listeners for touchscreen
-        window.addEventListener("resize", this._resizeCanvas);
-        this.canvas.addEventListener("touchstart", this._beginDraw, { passive: false });
-        this.canvas.addEventListener("touchmove", this._draw, { passive: false });
-        this.canvas.addEventListener("touchend", this._endDraw);
-
-        // Event listeners for mouse
-        this.canvas.addEventListener("mousedown", this._beginDraw, { passive: false });
-        this.canvas.addEventListener("mousemove", this._draw, { passive: false });
-        this.canvas.addEventListener("mouseup", this._endDraw);
+        this.#createEventListeners();
 
     }
     
@@ -44,6 +28,25 @@ class DrawingCanvas {
         this.canvas.width = this.canvasContainer.clientWidth;
         this.canvas.height = this.canvasContainer.clientHeight;
         this.clearCanvas();
+    }
+
+    #createEventListeners(){
+        // Bound methods to keep the correct `this`
+        this._resizeCanvas = this.#resizeCanvas.bind(this);
+        this._beginDraw = this.#beginDraw.bind(this);
+        this._draw = this.#draw.bind(this);
+        this._endDraw = this.#endDraw.bind(this);
+
+        // Event listeners for touchscreen
+        window.addEventListener("resize", this._resizeCanvas);
+        this.canvas.addEventListener("touchstart", this._beginDraw, { passive: false });
+        this.canvas.addEventListener("touchmove", this._draw, { passive: false });
+        this.canvas.addEventListener("touchend", this._endDraw);
+
+        // Event listeners for mouse
+        this.canvas.addEventListener("mousedown", this._beginDraw, { passive: false });
+        this.canvas.addEventListener("mousemove", this._draw, { passive: false });
+        this.canvas.addEventListener("mouseup", this._endDraw);
     }
 
     clearCanvas(){
@@ -70,6 +73,7 @@ class DrawingCanvas {
         this.ctx.beginPath();
         this.ctx.moveTo(x - rect.left, y - rect.top);
         this.userIsDrawing = true;
+        this.onDrawBegin();
     }
 
     #draw(event){
@@ -97,10 +101,13 @@ class DrawingCanvas {
     
     #endDraw(){
         this.userIsDrawing = false;
+        this.onDrawEnd();
     }
+
+    // These methods are left here for the user
+    // to extend functionality with a superclass
+    onDrawBegin(){}
+    onDrawEnd(){}
 }
 
-// example usage of class
-// document.addEventListener("DOMContentLoaded", function () {
-//     const drawing = new DrawingCanvas(".drawingCanvas", "white", "black");
-// });
+export default DrawingCanvas;
